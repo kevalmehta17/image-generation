@@ -7,7 +7,7 @@ dotenv.config();
 
 const app = express();
 app.use(cors({
-    origin: "http://localhost:5173", // Adjust this to your frontend origin
+    origin: "http://localhost:5173",
 }));
 app.use(express.json());
 
@@ -34,17 +34,15 @@ app.post("/generate", async (req, res) => {
         if (!prompt) {
             return res.status(400).json({ error: "Prompt is missing" });
         }
-
         console.log("Generating image with prompt:", prompt, "and size:", size);
 
-        // Updated API call using GPT-4o model for image generation
         const response = await axios.post(
             'https://api.openai.com/v1/images/generations',
             {
-                model: "gpt-4o",  // Specify GPT-4o model here
-                prompt,            // The user's prompt
-                n: 1,              // Number of images to generate
-                response_format: "url",  // Get the image URL
+                prompt,
+                size,
+                n: 1,
+                response_format: "url"
             },
             {
                 headers: {
@@ -62,7 +60,6 @@ app.post("/generate", async (req, res) => {
             return res.status(500).json({ error: "Image generation failed" });
         }
 
-        // Return the image URL to the frontend
         res.json({ imageUrl });
 
     } catch (error) {
@@ -71,7 +68,7 @@ app.post("/generate", async (req, res) => {
     }
 });
 
-// Handle image downloading (no change needed here)
+
 app.post("/download", async (req, res) => {
     try {
         const { imageUrl } = req.body;
@@ -85,6 +82,7 @@ app.post("/download", async (req, res) => {
         res.status(500).json({ error: "Failed to download image" });
     }
 });
+
 
 app.listen(PORT, () => {
     console.log(`Server running on http://localhost:${PORT}`);
